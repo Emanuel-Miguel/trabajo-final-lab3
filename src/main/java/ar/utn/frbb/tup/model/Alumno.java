@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Alumno {
-    private Integer id;
+    private Integer legajo;
     private String nombre;
     private String apellido;
     private Integer dni;
@@ -17,8 +17,8 @@ public class Alumno {
     public Alumno () {
     }
 
-    public Alumno(Integer id, String nombre, String apellido, Integer dni) {
-        this.id = id;
+    public Alumno(Integer legajo, String nombre, String apellido, Integer dni) {
+        this.legajo = legajo;
         this.nombre = nombre;
         this.apellido = apellido;
         this.dni = dni;
