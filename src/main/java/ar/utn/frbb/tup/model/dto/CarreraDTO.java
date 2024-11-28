@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class CarreraDTO {
     private String nombre;
-    private Integer codigoCarrera;
+    private Integer idCarrera;
     private Integer departamento;
     private Integer cantidadCuatrimestres;
 

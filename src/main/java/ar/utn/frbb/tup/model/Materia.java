@@ -3,30 +3,57 @@ package ar.utn.frbb.tup.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
 public class Materia {
-
-    private int materiaId;
+    private Integer idMateria;
     private String nombre;
-    private int anio;
-    private int cuatrimestre;
+    private Integer anio;
+    private Integer horas;
     private Profesor profesor;
-
-    private List<Materia> correlatividades;
+    private Carrera carrera;
 
     public Materia() {
     }
 
-    public Materia(String nombre, int anio, int cuatrimestre, Profesor profesor) {
-        this.anio = anio;
-        this.cuatrimestre = cuatrimestre;
+    public Materia(String nombre) {
         this.nombre = nombre;
-        this.profesor = profesor;
+    }
 
-        correlatividades = new ArrayList<>();
+
+    public Materia(Integer idMateria, String nombre, Integer anio, Integer horas, Profesor profesor, Carrera carrera) {
+        this.idMateria = idMateria;
+        this.nombre = nombre;
+        this.anio = anio;
+        this.horas = horas;
+        this.profesor = profesor;
+        this.carrera = carrera;
+    }
+
+    @Override
+    public String toString() {
+        return "Materia{" +
+                "idMateria=" + idMateria +
+                ", nombre='" + nombre + '\'' +
+                ", anio=" + anio +
+                ", horas=" + horas +
+                ", profesor=" + profesor +
+                ", carrera=" + carrera.getNombre() +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Materia materia = (Materia) o;
+        return Objects.equals(idMateria, materia.idMateria) && Objects.equals(nombre, materia.nombre) && Objects.equals(anio, materia.anio) && Objects.equals(horas, materia.horas) && Objects.equals(profesor, materia.profesor) && Objects.equals(carrera, materia.carrera);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idMateria, nombre, anio, horas, profesor, carrera);
     }
 }

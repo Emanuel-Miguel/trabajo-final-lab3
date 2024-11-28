@@ -1,6 +1,7 @@
 package ar.utn.frbb.tup.persistence.Implementation;
 
 import ar.utn.frbb.tup.model.Carrera;
+import ar.utn.frbb.tup.model.Materia;
 import ar.utn.frbb.tup.persistence.CarreraDao;
 import ar.utn.frbb.tup.persistence.exception.NoEncontradoException;
 import org.springframework.stereotype.Repository;
@@ -14,23 +15,33 @@ public class CarreraDaoMemoryImpl implements CarreraDao {
 
     @Override
     public Carrera saveCarrera(Carrera carrera) {
-        repositorioCarreras.put(carrera.getCodigoCarrera(), carrera);
+        repositorioCarreras.put(carrera.getIdCarrera(), carrera);
         System.out.println(repositorioCarreras);
         return carrera;
     }
 
     @Override
-    public String deleteCarrera(Integer codigoCarrera) throws NoEncontradoException {
-        if (!repositorioCarreras.containsKey(codigoCarrera)) {
-            throw new NoEncontradoException("El código de carrera no existe en el repositorio");
+    public String deleteCarrera(Integer idCarrera) throws NoEncontradoException {
+        if (!repositorioCarreras.containsKey(idCarrera)) {
+            throw new NoEncontradoException("El id de carrera no existe en el repositorio");
         }
-        repositorioCarreras.remove(codigoCarrera);
+        repositorioCarreras.remove(idCarrera);
         return "Eliminado con Exito";
     }
 
     @Override
-    public Carrera getCarrera(Integer codigoCarrera) {
-        return repositorioCarreras.get(codigoCarrera);
+    public Carrera getCarrera(Integer idCarrera) {
+        return repositorioCarreras.get(idCarrera);
+    }
+
+    @Override
+    public void agregarMateria(Materia materia, Integer idCarrera) {
+        repositorioCarreras.get(idCarrera).getMateriasList().add(materia);
+    }
+
+    @Override
+    public boolean existeCarreraPorId(Integer idCarrera) {
+        return repositorioCarreras.containsKey(idCarrera);
     }
 
 }

@@ -1,6 +1,7 @@
 package ar.utn.frbb.tup.controller.handler;
 
 import ar.utn.frbb.tup.business.exception.*;
+import ar.utn.frbb.tup.persistence.exception.DuplicadoException;
 import ar.utn.frbb.tup.persistence.exception.NoEncontradoException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,14 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         CustomApiError error = new CustomApiError();
         error.setErrorMessage(exceptionMessage);
         return handleExceptionInternal(ex, error, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(value = {DuplicadoException.class})
+    protected ResponseEntity<Object> handleDuplicadoException(DuplicadoException ex, WebRequest request) {
+        String exceptionMessage = ex.getMessage();
+        CustomApiError error = new CustomApiError();
+        error.setErrorMessage(exceptionMessage);
+        return handleExceptionInternal(ex, error, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(value
