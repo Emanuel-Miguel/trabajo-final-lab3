@@ -1,6 +1,7 @@
 package ar.utn.frbb.tup.business;
 
 import ar.utn.frbb.tup.business.Implementation.AlumnoServiceImpl;
+import ar.utn.frbb.tup.business.exception.DatoInvalidoException;
 import ar.utn.frbb.tup.model.*;
 import ar.utn.frbb.tup.model.dto.AlumnoDTO;
 import ar.utn.frbb.tup.model.dto.AsignaturaDTO;
@@ -18,9 +19,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-
 @RunWith(SpringRunner.class)
 public class AlumnoServiceTest {
     @InjectMocks
@@ -36,13 +34,17 @@ public class AlumnoServiceTest {
         alumnoDTO.setApellido("Perez");
         alumnoDTO.setDni(12345678);
 
-        Mockito.when(alumnoDao.existeAlumnoPorId(anyInt())).thenReturn(false);
-        Mockito.when(alumnoDao.saveAlumno(any(Alumno.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Alumno alumno = new Alumno( 1, "Juan", "Perez", 12345678, new ArrayList<>());
+
+        Mockito.when(alumnoDao.existeAlumnoPorId(1)).thenReturn(false);
+        Mockito.when(alumnoDao.saveAlumno(Mockito.any(Alumno.class))).thenReturn(alumno);
 
         Alumno resultado = alumnoService.crearAlumno(alumnoDTO);
 
         Assertions.assertNotNull(resultado);
         Assertions.assertEquals("Juan", resultado.getNombre());
+        Assertions.assertEquals("Perez", resultado.getApellido());
+        Assertions.assertEquals(12345678, resultado.getDni());
     }
     @Test
     public void testCrearAlumnoDuplicado() {
@@ -88,7 +90,6 @@ public class AlumnoServiceTest {
         Alumno alumnoActualizado = new Alumno(2, "Carlos", "Lopez", 87654321, new ArrayList<>());
 
         Mockito.when(alumnoDao.getAlumno(1)).thenReturn(alumnoExistente);
-        Mockito.when(alumnoDao.saveAlumno(any(Alumno.class))).thenAnswer(invocation -> invocation.getArgument(0));
         Mockito.when(alumnoDao.saveAlumno(Mockito.any(Alumno.class))).thenReturn(alumnoActualizado);
 
         Alumno resultado = alumnoService.actualizarAlumno(1, alumnoDTO);
@@ -99,28 +100,28 @@ public class AlumnoServiceTest {
     }
 
     @Test
-    public void testActualizarEstadoAsignaturaExito() throws NoEncontradoException {
+    public void testActualizarEstadoAsignaturaExito() throws NoEncontradoException, DatoInvalidoException {
         Integer idAlumno = 1;
         Integer idAsignatura = 101;
-        EstadoAsignatura nuevoEstado = EstadoAsignatura.APROBADA;
 
-        // Creacion de datos simulados
         Alumno alumnoMock = new Alumno();
         alumnoMock.setIdAlumno(idAlumno);
         alumnoMock.setAsignaturas(Arrays.asList(
                 new Asignatura(new Materia(1, "Matemáticas", 2023, 120, null, null),
-                        idAsignatura, EstadoAsignatura.CURSADA, 8)
+                        idAsignatura, EstadoAsignatura.CURSADA, null)
         ));
 
         AsignaturaDTO asignaturaDTO = new AsignaturaDTO();
-        asignaturaDTO.setEstado(nuevoEstado);
+        asignaturaDTO.setEstado(EstadoAsignatura.APROBADA);
+        asignaturaDTO.setNota(5);
 
         Mockito.when(alumnoDao.getAlumno(idAlumno)).thenReturn(alumnoMock);
 
         Asignatura asignaturaActualizada = alumnoService.actualizarEstadoAsignatura(idAlumno, idAsignatura, asignaturaDTO);
 
         Assertions.assertNotNull(asignaturaActualizada);
-        Assertions.assertEquals(nuevoEstado, asignaturaActualizada.getEstado());
+        Assertions.assertEquals(EstadoAsignatura.APROBADA, asignaturaActualizada.getEstado());
+        Assertions.assertEquals(5, asignaturaActualizada.getNota());
     }
 
     @Test

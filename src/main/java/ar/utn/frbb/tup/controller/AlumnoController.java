@@ -1,6 +1,7 @@
 package ar.utn.frbb.tup.controller;
 
 import ar.utn.frbb.tup.business.AlumnoService;
+import ar.utn.frbb.tup.business.exception.DatoInvalidoException;
 import ar.utn.frbb.tup.business.exception.DatoNumericoInvalidoException;
 import ar.utn.frbb.tup.business.exception.NombreInvalidoException;
 import ar.utn.frbb.tup.model.Alumno;
@@ -34,7 +35,7 @@ public class AlumnoController {
     }
 
     @PutMapping("/{idAlumno}/asignatura/{idAsignatura}")
-    public Asignatura actualizarEstadoAsignatura(@PathVariable Integer idAlumno, @PathVariable Integer idAsignatura, @RequestBody AsignaturaDTO asignaturaDTO) throws NoEncontradoException {
+    public Asignatura actualizarEstadoAsignatura(@PathVariable Integer idAlumno, @PathVariable Integer idAsignatura, @RequestBody AsignaturaDTO asignaturaDTO) throws NoEncontradoException, DatoInvalidoException {
         return alumnoService.actualizarEstadoAsignatura(idAlumno, idAsignatura, asignaturaDTO);
     }
 }

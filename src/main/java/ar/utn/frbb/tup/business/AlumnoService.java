@@ -1,5 +1,6 @@
 package ar.utn.frbb.tup.business;
 
+import ar.utn.frbb.tup.business.exception.DatoInvalidoException;
 import ar.utn.frbb.tup.business.exception.DatoNumericoInvalidoException;
 import ar.utn.frbb.tup.business.exception.NombreInvalidoException;
 import ar.utn.frbb.tup.model.Alumno;
@@ -16,5 +17,5 @@ public interface AlumnoService {
 
     Alumno actualizarAlumno(Integer idAlumno, AlumnoDTO alumnoDTO) throws NoEncontradoException, NombreInvalidoException, DatoNumericoInvalidoException;
 
-    Asignatura actualizarEstadoAsignatura(Integer idAlumno, Integer idAsignatura, AsignaturaDTO asignaturaDTO) throws NoEncontradoException;
+    Asignatura actualizarEstadoAsignatura(Integer idAlumno, Integer idAsignatura, AsignaturaDTO asignaturaDTO) throws NoEncontradoException, DatoInvalidoException;
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
-
 @Service
 public class AlumnoServiceImpl implements AlumnoService {
     @Autowired
@@ -40,12 +39,17 @@ public class AlumnoServiceImpl implements AlumnoService {
                 new Asignatura(new Materia(1, "Matemáticas", 2023, 120,
                         new Profesor("Alberto", "Sanchez", "Profesorado en Matematicas"),
                         new Carrera("Tecnicatura en Programacion", 3, 4, 8)),
-                        1, EstadoAsignatura.CURSADA, 8),
+                        1, EstadoAsignatura.CURSADA, null),
 
                 new Asignatura(new Materia(2, "Base de Datos", 2023, 80,
                         new Profesor("Graciela", "Fernandez", "Licenciada en Computacion"),
                         new Carrera("Tecnicatura en Programacion", 3, 4, 8)),
-                        2, EstadoAsignatura.NO_CURSADA, 5)
+                        2, EstadoAsignatura.NO_CURSADA, null),
+
+                new Asignatura(new Materia(3, "Física", 2023, 75,
+                        new Profesor("Mauricio", "Blanco", "Profesorado en Física"),
+                        new Carrera("Tecnicatura en Programacion", 3, 4, 8)),
+                        3, EstadoAsignatura.APROBADA, 8)
         );
         alumno.setAsignaturas(asignaturas);
 
@@ -72,7 +76,7 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
 
     @Override
-    public Asignatura actualizarEstadoAsignatura(Integer idAlumno, Integer idAsignatura, AsignaturaDTO asignaturaDTO) throws NoEncontradoException {
+    public Asignatura actualizarEstadoAsignatura(Integer idAlumno, Integer idAsignatura, AsignaturaDTO asignaturaDTO) throws NoEncontradoException, DatoInvalidoException {
         Alumno alumno = alumnoDao.getAlumno(idAlumno);
         if (alumno == null) {
             throw new NoEncontradoException("El alumno con id " + idAlumno + " no existe");
@@ -81,7 +85,6 @@ public class AlumnoServiceImpl implements AlumnoService {
         Asignatura asignatura = null;
         for (Asignatura a : alumno.getAsignaturas()) {
             if (a.getIdAsignatura().equals(idAsignatura)) {
-                a.setEstado(asignaturaDTO.getEstado());
                 asignatura = a;
                 break;
             }
@@ -91,7 +94,49 @@ public class AlumnoServiceImpl implements AlumnoService {
             throw new NoEncontradoException("La asignatura con ID " + idAsignatura + " no existe para el alumno con id " + idAlumno);
         }
 
+        EstadoAsignatura nuevoEstado = asignaturaDTO.getEstado();
+        Integer nota = asignaturaDTO.getNota();
+
+        switch (nuevoEstado) {
+            case CURSADA:
+                if (nota != null) {
+                    throw new DatoInvalidoException("Si una asignatura está CURSADA no debe tener nota.");
+                }
+                asignatura.setEstado(nuevoEstado);
+                asignatura.setNota(null);
+                break;
+
+            case NO_CURSADA:
+                if (nota != null) {
+                    throw new DatoInvalidoException("Si una asignatura está NO_CURSADA no debe tener nota.");
+                }
+                asignatura.setEstado(nuevoEstado);
+                asignatura.setNota(null);
+                break;
+
+            case APROBADA:
+                if (asignatura.getEstado() == EstadoAsignatura.APROBADA) {
+                    if (asignatura.getNota() != null && asignatura.getNota() >= 4) {
+
+                        throw new DatoInvalidoException("La asignatura ya está APROBADA. No es necesario realizar cambios en el estado.");
+                    }
+                }else if (asignatura.getEstado() == EstadoAsignatura.CURSADA) {
+                    if (nota == null || nota < 4) {
+                        throw new DatoInvalidoException("Para aprobar una asignatura, la nota debe ser mayor o igual a 4.");
+                    }
+                    asignatura.setEstado(nuevoEstado);
+                    asignatura.setNota(nota);
+                } else {
+                    throw new DatoInvalidoException("Solo se puede cambiar a APROBADA si está CURSADA.");
+                }
+                break;
+
+            default:
+                throw new DatoInvalidoException("Estado no válido para la asignatura.");
+        }
+
         alumnoDao.saveAlumno(alumno);
+
         return asignatura;
     }
 
